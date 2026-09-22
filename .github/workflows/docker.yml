@@ -1,4 +1,4 @@
-name: Docker Build
+name: Docker Build and Push
 
 on:
   push:
@@ -6,15 +6,27 @@ on:
       - master
 
 jobs:
-  docker-build:
+  docker-build-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build backend Docker image
-        run: docker build -t devopsguard-backend ./backend
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build frontend Docker image
-        run: docker build -t devopsguard-frontend ./frontend
+      - name: Build backend image
+        run: docker build -t kubrasyeda866/devopsguard-backend:latest ./backend
+
+      - name: Push backend image
+        run: docker push kubrasyeda866/devopsguard-backend:latest
+
+      - name: Build frontend image
+        run: docker build -t kubrasyeda866/devopsguard-frontend:latest ./frontend
+
+      - name: Push frontend image
+        run: docker push kubrasyeda866/devopsguard-frontend:latest
